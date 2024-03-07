@@ -91,7 +91,9 @@ with col3:
         index=['Target', 'Donor']
     )
     st.dataframe(df)
-    st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    if len(target) == 14 and len(donor) == 14:
+        st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    
 
 # Output
 if target != '' and donor != '':
