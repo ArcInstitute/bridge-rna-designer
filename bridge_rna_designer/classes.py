@@ -3,12 +3,17 @@ from bridge_rna_designer import errors
 import re
 
 class WTBridgeRNA177nt:
+    """
+    A class to represent a 177 nt bridge RNA.
+    """
 
+    # Template sequence
     TEMPLATE = "AGTGCAGAGAAAATCGGCCAGTTTTCTCTGCCTGCAGTCCGCATGCCGTNNNNNNNNNTGGGTTCTAACCTGTNNNNNNNNNTTATGCAGCGGACTGCCTTTCTCCCAAAGTGATAAACCGGNNNNNNNNATGGACCGGTTTTCCCGGTAATCCGTNNTTNNNNNNNTGGTTTCACT"
     DOT_STRUC_P1 = "...(((((((((((......))))))))))).((((((((((.(((............(((((....)))))..............))))).)))))))).........((((....(((.............((((((.....)))))...)...............)))..))))"
     DOT_STRUC_P2 = "((.(((((((((((......)))))))))))))(((((((((.(((.............<(((.<>.)))>...............))))))))))))...........((((...<(((..........<.(((((((.....)))))...))....>.........)))>.))))"
     GUIDES = ".................................................LLLLLLLCC...............RRRRRCCHH........................................lllllllc..........................rr..rrrcchh.........."
 
+    # Sequence regions
     LTG_REGION = (49, 58)
     RTG_REGION = (73, 80)
     LDG_REGION = (122, 130)
@@ -22,41 +27,57 @@ class WTBridgeRNA177nt:
         self.target = None
         self.donor = None
 
-    def update_target(self, target):
-
+    def update_target(self, target: str):
+        """
+        Update the target sequence.
+        Args:
+            target: The target sequence (14 bp).
+        """
+        # Store target
         self.target = target
 
+        # Check core of target
         core = target[7:9]
         if core not in ["CT", "GT"]:
             errors.NotCTorGTCoreWarning()
         if core not in ["CT", "GT", "AT", "TT"]:
             errors.NotNTCoreWarning()
 
+        # Update bridge sequence
         bridgeseq = list(self.bridge_sequence)
-
         bridgeseq[self.LTG_REGION[0]:self.LTG_REGION[1]] = list(target[:9])
         bridgeseq[self.RTG_REGION[0]:self.RTG_REGION[1]] = list(reverse_complement(target[7:]))
-
         self.bridge_sequence = "".join(bridgeseq)
 
-    def update_donor(self, donor):
+    def update_donor(self, donor: str):
+        """
+        Update the donor sequence.
+        Args:
+            donor: The donor sequence (14 bp).
+        """
+        # Store donor
         self.donor = donor
 
+        # Check input
         if self.has_donor_p7C():
             errors.DonorP7CWarning()
 
+        # Update bridge sequence
         bridgeseq = list(self.bridge_sequence)
         bridgeseq[self.LDG_REGION[0]:self.LDG_REGION[1]] = list(donor[:8])
         bridgeseq[self.RDG1_REGION[0]:self.RDG1_REGION[1]] = list(reverse_complement(donor[7:-2]))
         bridgeseq[self.RDG2_REGION[0]:self.RDG2_REGION[1]] = list(reverse_complement(donor[-2:]))
-
         self.bridge_sequence = "".join(bridgeseq)
 
     def update_hsg(self):
+        """
+        Update the HSG region of the bridge RNA.
+        """
+        # Update bridge sequence
         bridgeseq = list(self.bridge_sequence)
-
         target_p6p7, donor_p6p7 = self.get_p6p7()
 
+        # Ff P6-P7 do not match, reverse complement the donor P6-P7 and target P6-P7
         if target_p6p7 != donor_p6p7:
             bridgeseq[self.TBL_HSG_REGION[0]:self.TBL_HSG_REGION[1]] = list(reverse_complement(donor_p6p7))
             bridgeseq[self.DBL_HSG_REGION[0]:self.DBL_HSG_REGION[1]] = list(reverse_complement(target_p6p7))
@@ -107,7 +128,14 @@ class WTBridgeRNA177nt:
         else:
             return False
 
-    def format_fasta(self, line_wrap=80):
+    def format_fasta(self, line_wrap: int=80) -> str:
+        """
+        Format the bridge RNA as a FASTA sequence.
+        Args:
+            line_wrap: The number of characters to wrap the sequence at. If set to 0, the sequence will not be wrapped.
+        Returns:
+            str: The formatted FASTA sequence.
+        """
         out = ">BridgeRNA_tgt_{}_dnr_{}\n".format(self.target, self.donor)
         if line_wrap > 1:
             for i in range(0, len(self.bridge_sequence), line_wrap):
@@ -116,7 +144,14 @@ class WTBridgeRNA177nt:
             out += self.bridge_sequence
         return out
 
-    def format_stockholm(self, whitespaces=5):
+    def format_stockholm(self, whitespaces: int=5) -> str:
+        """
+        Format the bridge RNA as a Stockholm sequence.
+        Args:
+            whitespaces: The number of whitespaces to use for leader columns.
+        Returns:
+            str: The formatted Stockholm sequence.
+        """
         seqname = "BridgeRNA_tgt_{}_dnr_{}".format(self.target, self.donor)
         leader_cols = len(seqname)+whitespaces
         out = "# STOCKHOLM 1.0\n"
@@ -146,7 +181,7 @@ class WTBridgeRNA177nt:
         out += "//"
         return out
 
-    # Custom print function
+    # Class custom print function 
     def __str__(self):
         out = "<WTBridgeRNA177nt>\n"
         out += '- Programmed target: {}\n'.format(self.target)
