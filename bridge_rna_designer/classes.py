@@ -107,10 +107,13 @@ class WTBridgeRNA177nt:
         else:
             return False
 
-    def format_fasta(self):
+    def format_fasta(self, line_wrap=80):
         out = ">BridgeRNA_tgt_{}_dnr_{}\n".format(self.target, self.donor)
-        out += self.bridge_sequence
-
+        if line_wrap > 1:
+            for i in range(0, len(self.bridge_sequence), line_wrap):
+                out += self.bridge_sequence[i:i+line_wrap] + "\n"
+        else:
+            out += self.bridge_sequence
         return out
 
     def format_stockholm(self, whitespaces=5):

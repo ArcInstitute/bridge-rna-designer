@@ -80,18 +80,46 @@ if target != '' and donor != '':
         },
         index=['Target', 'Donor']
     )
-    st.table(df)
+    st.dataframe(df)
+
+    if 'brna' not in st.session_state:
+        st.session_state.brna = None
 
     ## Submit button
-    if st.button('Design Bridge RNA'):
+    if st.button('Design Bridge RNA') or st.session_state['brna'] is not None:
         # Output
         with st.spinner("Calculating..."):
             st.markdown('#### Bridge RNA')
+            brna = None
             try:
-                brna = design_bridge_rna(target, donor)
-                st.text(brna.format_fasta())
-                st.text(brna.format_stockholm())
+                st.session_state['brna'] = design_bridge_rna(target, donor)
             except Exception as e:
                 st.error(f"Error: {e}")
+
+            if st.session_state['brna'] is not None:
+                # fasta
+                fasta = st.session_state['brna'].format_fasta()
+                st.markdown('##### Fasta')
+                st.text(fasta)
+                ## download link
+                st.download_button(
+                    label="Download fasta",
+                    data=fasta,
+                    file_name='bridge-rna.fasta',
+                    mime='text/plain',
+                )
+                # stockholm
+                st.markdown('##### Stockholm')
+                stockholm = st.session_state['brna'].format_stockholm()
+                st.text(stockholm)
+                ## download link
+                st.download_button(
+                    label="Download stockholm",
+                    data=stockholm,
+                    file_name='bridge-rna.sto',
+                    mime='text/plain',
+                )
+
+
 
 
