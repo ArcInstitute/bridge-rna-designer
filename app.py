@@ -8,11 +8,12 @@ import streamlit as st
 ## package
 from bridge_rna_designer.run import design_bridge_rna
 
-# functions
+# Functions
 def get_image_as_base64(path):
     with open(path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     return "data:image/png;base64," + encoded_string
+
 
 # App init
 st.set_page_config(
@@ -38,7 +39,8 @@ st.markdown("""
         font-family: 'IBM Plex Sans', sans-serif;
     }
     </style>
-    """, unsafe_allow_html=True
+    """, 
+    unsafe_allow_html=True
 )
 
 # Main
@@ -48,28 +50,36 @@ st.markdown(
     f"""
     <div style="display: flex; align-items: center;">
         <a href="https://arcinstitute.org/tools/cas13d" target="_blank">
-            <img src="{image_base64}" alt="ARC Institute Logo" style="vertical-align: middle; margin-left: 15px; margin-right: 30px;" width="65" height="65">
+            <img src="{image_base64}" alt="ARC Institute Logo" style="vertical-align: middle; margin-left: 2px; margin-right: 15px;" width="60" height="60">
         </a>
         <span class='font-castoro'>
             <h2>Bridge RNA Design Tool</h2>
         </span>
     </div>
     <div>
-        <p>Given 14 bp target and donor sequences, this tool will return a candidate 177 nt bridge RNA that should work with the wild-type bridge recombinase (IS621)</p>
+        <p>
+           Given 14 bp target and donor sequences, 
+           this tool will return a candidate 177 nt bridge RNA
+           that should work with the wild-type bridge recombinase
+           (IS621).
+        </p>
     </div>
     """, unsafe_allow_html=True
 )
 
-# Input fields
-## Full sequence
-st.markdown('#### Input')
-col1a, col2a = st.columns([0.5, 0.5])
-with col1a:
-    target = st.text_input('Target sequence (14 bp)', value='ATCGGGCCTACGCA')
-with col2a:
-    donor = st.text_input('Donor sequence (14 bp)', value='ACAGTATCTTGTAT')    
+# Session states
+if 'brna' not in st.session_state:
+    st.session_state.brna = None
+if 'calc_button' not in st.session_state:
+    st.session_state.calc_button = False
 
-if target != '' and donor != '':
+# Input
+col1, col2, col3 = st.columns([0.30, 0.05, 0.65])
+with col1:
+    st.markdown('#### Input')
+    target = st.text_input('Target sequence (14 bp)', value='ATCGGGCCTACGCA')
+    donor = st.text_input('Donor sequence (14 bp)', value='ACAGTATCTTGTAT')    
+with col3:
     # create dataframe for display
     st.markdown('#### Sequence Components')
     df = pd.DataFrame(
@@ -81,44 +91,49 @@ if target != '' and donor != '':
         index=['Target', 'Donor']
     )
     st.dataframe(df)
+    st.session_state['calc_button'] = st.button('Design Bridge RNA')
 
-    if 'brna' not in st.session_state:
-        st.session_state.brna = None
-
+# Output
+if target != '' and donor != '':
     ## Submit button
-    if st.button('Design Bridge RNA') or st.session_state['brna'] is not None:
+    if st.session_state['calc_button'] or st.session_state['brna'] is not None:
         # Output
         with st.spinner("Calculating..."):
+            # Calculate bridge RNA
             st.markdown('#### Bridge RNA')
             brna = None
             try:
                 st.session_state['brna'] = design_bridge_rna(target, donor)
             except Exception as e:
                 st.error(f"Error: {e}")
-
+                st.session_state['brna'] = None
+            # Display output
             if st.session_state['brna'] is not None:
-                # fasta
-                fasta = st.session_state['brna'].format_fasta()
-                st.markdown('##### Fasta')
-                st.text(fasta)
-                ## download link
-                st.download_button(
-                    label="Download fasta",
-                    data=fasta,
-                    file_name='bridge-rna.fasta',
-                    mime='text/plain',
-                )
-                # stockholm
-                st.markdown('##### Stockholm')
-                stockholm = st.session_state['brna'].format_stockholm()
-                st.text(stockholm)
-                ## download link
-                st.download_button(
-                    label="Download stockholm",
-                    data=stockholm,
-                    file_name='bridge-rna.sto',
-                    mime='text/plain',
-                )
+                tab1, tab2 = st.tabs(['fasta', 'stockholm'])
+                with tab1:
+                    # fasta
+                    fasta = st.session_state['brna'].format_fasta()
+                    st.markdown('##### FASTA')
+                    st.text(fasta)
+                    ## download link
+                    st.download_button(
+                        label="Download fasta",
+                        data=fasta,
+                        file_name='bridge-rna.fasta',
+                        mime='text/plain',
+                    )
+                with tab2:
+                    # stockholm
+                    st.markdown('##### STOCKHOLM')
+                    stockholm = st.session_state['brna'].format_stockholm()
+                    st.text(stockholm)
+                    ## download link
+                    st.download_button(
+                        label="Download stockholm",
+                        data=stockholm,
+                        file_name='bridge-rna.sto',
+                        mime='text/plain',
+                    )
 
 
 
