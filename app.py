@@ -102,7 +102,7 @@ if target != '' and donor != '':
                 st.session_state['brna'] = None
             # Display output
             if st.session_state['brna'] is not None:
-                tab1, tab2 = st.tabs(['fasta', 'stockholm'])
+                tab1, tab2 = st.tabs(['stockholm', 'fasta'])
                 with tab1:
                     # stockholm
                     st.markdown('##### STOCKHOLM')
