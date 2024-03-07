@@ -14,7 +14,6 @@ def get_image_as_base64(path):
         encoded_string = base64.b64encode(image_file.read()).decode()
     return "data:image/png;base64," + encoded_string
 
-
 # App init
 st.set_page_config(
     page_title="Bridge RNA Design",
@@ -24,24 +23,16 @@ st.set_page_config(
     menu_items=None
 )
 
-# Styling
-font_url_h = "https://fonts.googleapis.com/css2?family=Castoro"
-st.markdown(f'<link href="{font_url_h}" rel="stylesheet">', unsafe_allow_html=True)
-font_url_c = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap"
-st.markdown(f'<link href="{font_url_c}" rel="stylesheet">', unsafe_allow_html=True)
-## Custom CSS
-st.markdown("""
-    <style>
-    .font-castoro {
-        font-family: 'Castoro', sans-serif;
-    }
-    .font-ibm-plex-sans {
-        font-family: 'IBM Plex Sans', sans-serif;
-    }
-    </style>
-    """, 
-    unsafe_allow_html=True
-)
+# Set custom styles
+font_css = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
+body * {
+    font-family: 'Roboto', sans-serif !important;
+}
+</style>
+"""
+st.markdown(font_css, unsafe_allow_html=True)
 
 # Main
 ## Title
@@ -113,18 +104,6 @@ if target != '' and donor != '':
             if st.session_state['brna'] is not None:
                 tab1, tab2 = st.tabs(['fasta', 'stockholm'])
                 with tab1:
-                    # fasta
-                    fasta = st.session_state['brna'].format_fasta()
-                    st.markdown('##### FASTA')
-                    st.text(fasta)
-                    ## download link
-                    st.download_button(
-                        label="Download fasta",
-                        data=fasta,
-                        file_name='bridge-rna.fasta',
-                        mime='text/plain',
-                    )
-                with tab2:
                     # stockholm
                     st.markdown('##### STOCKHOLM')
                     stockholm = st.session_state['brna'].format_stockholm()
@@ -136,6 +115,19 @@ if target != '' and donor != '':
                         file_name='bridge-rna.sto',
                         mime='text/plain',
                     )
+                with tab2:
+                    # fasta
+                    fasta = st.session_state['brna'].format_fasta()
+                    st.markdown('##### FASTA')
+                    st.text(fasta)
+                    ## download link
+                    st.download_button(
+                        label="Download fasta",
+                        data=fasta,
+                        file_name='bridge-rna.fasta',
+                        mime='text/plain',
+                    )
+
 
 
 
