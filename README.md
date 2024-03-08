@@ -33,8 +33,6 @@ BridgeRNA_tgt_ATCGGGCCTACGCA_dnr_ACAGTATCTTGTAT     AGTGCAGAGAAAATCGGCCAGTTTTCTC
 
 ## Deployment
 
-### Docker
-
 Set parameters
 
 ```bash
@@ -45,6 +43,9 @@ GCP_PROJECT_ID="arc-genomics"
 SERVICE_ACCOUNT_EMAIL="237698044331-compute@developer.gserviceaccount.com"
 SERVICE_ACCOUNT_JSON="237698044331-compute.json"
 ```
+
+### Docker
+
 
 Build the container:
 
@@ -66,7 +67,7 @@ docker run -it --rm \
 
 You can use `--entrypoint /bin/bash` to run the docker container in interactive mode.
 
-## Artifact Registry
+### Artifact Registry
 
 **If needed**, create Artifact Registry:
 
@@ -88,7 +89,7 @@ docker tag ${IMG_NAME}:${IMG_VERSION} \
   && docker push us-west1-docker.pkg.dev/${GCP_PROJECT_ID}/${IMG_NAME}/${IMG_NAME}:${IMG_VERSION}
 ```
 
-## GCP Cloud Run
+### GCP Cloud Run
 
 Deploy to Cloud Run:
 

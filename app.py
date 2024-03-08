@@ -28,7 +28,7 @@ font_css = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
 body * {
-    font-family: 'Roboto', sans-serif !important;
+    font-family: 'IBM Plex Sans', sans-serif !important;
 }
 </style>
 """
@@ -43,7 +43,7 @@ st.markdown(
         <a href="https://arcinstitute.org/tools/cas13d" target="_blank">
             <img src="{image_base64}" alt="ARC Institute Logo" style="vertical-align: middle; margin-left: 2px; margin-right: 15px;" width="60" height="60">
         </a>
-        <span class='font-castoro'>
+        <span class='app-title'>
             <h2>Bridge RNA Design Tool</h2>
         </span>
     </div>
