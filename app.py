@@ -30,6 +30,9 @@ font_css = """
 body * {
     font-family: 'IBM Plex Sans', sans-serif !important;
 }
+code, pre {
+    font-family: 'Courier New', monospace !important;
+}
 </style>
 """
 st.markdown(font_css, unsafe_allow_html=True)
@@ -107,7 +110,7 @@ if target != '' and donor != '':
                     # stockholm
                     st.markdown('##### STOCKHOLM')
                     stockholm = st.session_state['brna'].format_stockholm()
-                    st.text(stockholm)
+                    st.markdown(f"```\n{stockholm}\n```")
                     ## download link
                     st.download_button(
                         label="Download stockholm",
