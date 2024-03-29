@@ -5,6 +5,7 @@ import base64
 ## 3rd party
 import pandas as pd
 import streamlit as st
+import pyperclip
 ## package
 from bridge_rna_designer.run import design_bridge_rna
 
@@ -24,7 +25,7 @@ st.set_page_config(
 )
 
 # Set custom styles
-font_css = """
+custom_css = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
 body * {
@@ -35,7 +36,7 @@ code, pre {
 }
 </style>
 """
-st.markdown(font_css, unsafe_allow_html=True)
+st.markdown(custom_css, unsafe_allow_html=True)
 
 # Main
 ## Title
@@ -85,14 +86,28 @@ with col3:
         index=['Target', 'Donor']
     )
     st.dataframe(df)
-    if len(target) == 14 and len(donor) == 14:
-        st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    st.session_state['calc_button'] = st.button('Design Bridge RNA')
     
+def create_stockholm_table():
+    DF = pd.DataFrame({
+        'Key': ['#=GC', 'L', 'R', 'H', 'C', 'l', 'r', 'h', 'c'],
+        'Description': [
+            'guides', 'left target guide (LTG)', 'right target guide (RTG)', 
+            'TBL handshake guide (TBL-HSG)', 'TBL core-binding guide', 
+            'left donor guide (LDG)', 'right donor guide (RDG)', 
+            'DBL handshake guide (DBL-HSG)', 'DBL core-binding guide'
+        ]
+    })
+    return DF.to_markdown(index=False)
 
 # Output
 if target != '' and donor != '':
     ## Submit button
     if st.session_state['calc_button'] or st.session_state['brna'] is not None:
+        # check input
+        if len(target) != 14 or len(donor) != 14:
+            st.error('Please enter 14 bp sequences for both target and donor.')
+            st.stop()
         # Output
         with st.spinner("Calculating..."):
             # Calculate bridge RNA
@@ -111,18 +126,29 @@ if target != '' and donor != '':
                     st.markdown('##### STOCKHOLM')
                     stockholm = st.session_state['brna'].format_stockholm()
                     st.markdown(f"```\n{stockholm}\n```")
+                    col1,col2,col3 = st.columns([0.3, 0.6, 0.1])
                     ## download link
-                    st.download_button(
-                        label="Download stockholm",
-                        data=stockholm,
-                        file_name='bridge-rna.sto',
-                        mime='text/plain',
-                    )
+                    with col1:
+                        st.download_button(
+                            label="Download stockholm",
+                            data=stockholm,
+                            file_name='bridge-rna.sto',
+                            mime='text/plain'
+                        )
+                    with col2:
+                        with st.expander('Stockholm format key'):
+                            st.write(create_stockholm_table())
+                    ## copy to clipboard (pyperclip)
+                    # if st.button('Copy to clipboard'):
+                    #     pyperclip.copy(stockholm)
+                    #     st.success('Text copied successfully!')
+
                 with tab2:
                     # fasta
                     fasta = st.session_state['brna'].format_fasta()
                     st.markdown('##### FASTA')
-                    st.text(fasta)
+                    #st.text(fasta)
+                    st.markdown(f"```\n{fasta}\n```")
                     ## download link
                     st.download_button(
                         label="Download fasta",
@@ -131,7 +157,11 @@ if target != '' and donor != '':
                         mime='text/plain',
                     )
 
-
-
+st.divider()
+st.markdown("""
+Bridge RNAs direct modular and programmable recombination of target and donor DNA
+Matthew G. Durrant, Nicholas T. Perry, James J. Pai, Aditya R. Jangid, Januka S. Athukoralage, Masahiro Hiraizumi, John P. McSpedon, April Pawluk, Hiroshi Nishimasu, Silvana Konermann, Patrick D. Hsu
+bioRxiv 2024.01.24.577089; doi: https://doi.org/10.1101/2024.01.24.577089
+""")
 
 
