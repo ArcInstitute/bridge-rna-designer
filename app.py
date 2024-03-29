@@ -5,7 +5,7 @@ import base64
 ## 3rd party
 import pandas as pd
 import streamlit as st
-import pyperclip
+# import pyperclip
 ## package
 from bridge_rna_designer.run import design_bridge_rna
 
