@@ -5,6 +5,7 @@ import base64
 ## 3rd party
 import pandas as pd
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 # import pyperclip
 ## package
 from bridge_rna_designer.run import design_bridge_rna
@@ -86,7 +87,9 @@ with col3:
         index=['Target', 'Donor']
     )
     st.dataframe(df)
-    st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    with stylable_container('btn-calc', css_styles='button { margin-left: 35px; width: 50%; }'):
+        st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    
     
 def create_stockholm_table():
     DF = pd.DataFrame({
@@ -129,12 +132,13 @@ if target != '' and donor != '':
                     col1,col2,col3 = st.columns([0.3, 0.6, 0.1])
                     ## download link
                     with col1:
-                        st.download_button(
-                            label="Download stockholm",
-                            data=stockholm,
-                            file_name='bridge-rna.sto',
-                            mime='text/plain'
-                        )
+                        with stylable_container('dtl-stockholm', css_styles='button { height: 48px; width: 100%; }'):
+                            st.download_button(
+                                label="Download stockholm",
+                                data=stockholm,
+                                file_name='bridge-rna.sto',
+                                mime='text/plain'
+                            )
                     with col2:
                         with st.expander('Stockholm format key'):
                             st.write(create_stockholm_table())
