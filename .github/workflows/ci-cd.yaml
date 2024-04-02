@@ -76,6 +76,6 @@ jobs:
             --port=${{ env.PORT }}
             --cpu=2
             --memory=2Gi
-            --max-instances=1
-            --concurrency=80
-
+            --min-instances=1
+            --max-instances=3
+            --concurrency=40
