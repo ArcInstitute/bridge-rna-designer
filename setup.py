@@ -13,7 +13,7 @@ with open('README.md') as f:
 
 setup(
     name="bridgernadesigner",
-    version='0.0.1_dev',
+    version='0.1.0',
     description='Software package to design bridge RNAs as described by Durrant & Perry et al.',
     long_description=long_description,
     long_description_content_type="text/markdown",
