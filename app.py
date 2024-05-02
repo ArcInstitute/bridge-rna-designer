@@ -39,7 +39,7 @@ table, td {
     color: white !important;
 }
 a {
-    color: black !important;  /* This sets the link color to black */
+    color: white !important;
 }
 </style>
 """
