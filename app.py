@@ -6,8 +6,7 @@ import base64
 import pandas as pd
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
-## package
-from bridge_rna_designer.run import design_bridge_rna
+from bridgernadesigner.run import design_bridge_rna
 
 # Functions
 def get_image_as_base64(path):
