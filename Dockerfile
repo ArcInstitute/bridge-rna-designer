@@ -18,7 +18,6 @@ COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
 # Copy the app files into the container
-COPY bridge_rna_designer/ ./bridge_rna_designer/
 COPY .streamlit/ ./.streamlit/
 COPY img/ ./img/
 COPY app.py ./
