@@ -37,5 +37,5 @@ BridgeRNA_tgt_ATCGGGCCTACGCA_dnr_ACAGTATCTTGTAT     AGTGCAGAGAAAATCGGCCAGTTTTCTC
 ### Run locally
 
 ```bash
-streamlit run app.py
+streamlit run app.py --server.address=0.0.0.0
 ```

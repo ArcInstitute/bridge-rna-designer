@@ -91,11 +91,9 @@ with col3:
         },
         index=['Target', 'Donor']
     )
-    #st.dataframe(df)
     st.table(df)
-    with stylable_container('btn-calc', css_styles='button { margin-left: 35px; width: 50%; }'):
+    with stylable_container('btn-calc', css_styles='button { margin-left: 45px; width: 55%; }'):
         st.session_state['calc_button'] = st.button('Design Bridge RNA')
-    
     
 def create_stockholm_table():
     DF = pd.DataFrame({
@@ -121,7 +119,6 @@ if target != '' and donor != '':
         with st.spinner('Calculating...'):
             # Calculate bridge RNA
             st.markdown('#### Bridge RNA')
-            brna = None
             try:
                 st.session_state['brna'] = design_bridge_rna(target, donor)
             except Exception as e:
@@ -150,8 +147,30 @@ if target != '' and donor != '':
                             st.write(create_stockholm_table())
                 with tab2:
                     # fasta tab
-                    fasta = st.session_state['brna'].format_fasta()
                     st.markdown('##### FASTA')
+                    # annealing oligos
+                    include_an_oligos = st.checkbox('Include annealing oligos?', value=False)
+                    if include_an_oligos:
+                        col1a,col2a = st.columns([0.5, 0.5])
+                        with col1a:
+                            lh_overhang = st.text_input(
+                                '5\' overhang for annealing oligos.', 
+                                value='TAGC'
+                            )
+                        with col2a:
+                            rh_overhang = st.text_input(
+                                '3\' overhang for annealing oligos', 
+                                value='GGCC'
+                            )
+                    else:
+                        lh_overhang = None
+                        rh_overhang = None
+                    # fasta generation
+                    fasta = st.session_state['brna'].format_fasta(
+                        include_annealing_oligos=include_an_oligos,
+                        lh_overhang=lh_overhang,
+                        rh_overhang=rh_overhang
+                    )
                     st.markdown(f"```\n{fasta}\n```")
                     ## download link
                     col1,col2 = st.columns([0.3, 0.7])
@@ -163,15 +182,7 @@ if target != '' and donor != '':
                             file_name='bridge-rna.fasta',
                             mime='text/plain',
                         )
-                    with col2:
-                        # annealing oligos
-                        include_an_oligo = st.checkbox('Include annealing oligos?', value=True)
-                        if include_an_oligo:
-                            col1a,col2a = st.columns([0.5, 0.5])
-                            with col1a:
-                                lh_overhang = st.text_input('5\' overhang for annealing oligos.', value='TAGC')
-                            with col2a:
-                                rh_overhang = st.text_input('3\' overhang for annealing oligos', value='GGCC')   
+                        
 
 st.divider()
 st.markdown("""

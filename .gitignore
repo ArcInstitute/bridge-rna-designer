@@ -2,3 +2,4 @@ BridgeRNADesigner-ShinyApp-main/
 *.pyc
 .DS_Store
 DEPLOY.md
+tmp/
