@@ -186,12 +186,19 @@ if target != '' and donor != '':
 
 st.divider()
 st.markdown("""
-Bridge RNAs direct modular and programmable recombination of target and donor DNA
-Matthew G. Durrant, Nicholas T. Perry, James J. Pai, Aditya R. Jangid, Januka S. Athukoralage, 
-Masahiro Hiraizumi, John P. McSpedon, April Pawluk, Hiroshi Nishimasu, Silvana Konermann, Patrick D. Hsu
-bioRxiv 2024.01.24.577089; doi: https://doi.org/10.1101/2024.01.24.577089
+### References
+            
+Durrant, M.G., Perry, N.T., Pai, J.J. et al.
+Bridge RNAs direct programmable recombination of target and donor DNA. 
+Nature 630, 984-993 (2024). https://doi.org/10.1038/s41586-024-07552-4
+
+Hiraizumi, M., Perry, N.T., Durrant, M.G. et al.
+Structural mechanism of bridge RNA-guided recombination.
+Nature 630, 994–1002 (2024). https://doi.org/10.1038/s41586-024-07570-2
 """)
 st.markdown("""
+### Code
+            
 View the code and obtain the CLI tool from [GitHub](https://github.com/hsulab-arc/BridgeRNADesigner)
 """)
 
