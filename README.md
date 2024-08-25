@@ -1,41 +1,25 @@
 Bridge RNA Designer
 ===================
 
-A command line and web interface for designing Bridge RNAs for Bridge Editing.
+A web interface for designing Bridge RNAs for Bridge Editing.
 
-# CLI
+# References
 
-## Installation
+> Durrant, M.G., Perry, N.T., Pai, J.J. et al. Bridge RNAs direct programmable recombination of target and donor DNA. Nature 630, 984-993 (2024). https://doi.org/10.1038/s41586-024-07552-4
 
-```bash
-pip install -e .
-```
-
-## Usage
-
-Command to design a Bridge RNA for a given target and donor sequence.
-```bash
-brna-design --target ATCGGGCCTACGCA --donor ACAGTATCTTGTAT
-```
-
-Example output:
-
-```console
-# STOCKHOLM 1.0
-BridgeRNA_tgt_ATCGGGCCTACGCA_dnr_ACAGTATCTTGTAT     AGTGCAGAGAAAATCGGCCAGTTTTCTCTGCCTGCAGTCCGCATGCCGTATCGGGCCTTGGGTTCTAACCTGTTGCGTAGATTTATGCAGCGGACTGCCTTTCTCCCAAAGTGATAAACCGGACAGTATCATGGACCGGTTTTCCCGGTAATCCGTATTTACAAGGCTGGTTTCACT
-#=GC bRNA_template                                  AGTGCAGAGAAAATCGGCCAGTTTTCTCTGCCTGCAGTCCGCATGCCGTNNNNNNNNNTGGGTTCTAACCTGTNNNNNNNNNTTATGCAGCGGACTGCCTTTCTCCCAAAGTGATAAACCGGNNNNNNNNATGGACCGGTTTTCCCGGTAATCCGTNNTTNNNNNNNTGGTTTCACT
-#=GC guides                                         .................................................LLLLLLLCC...............RRRRRCCHH........................................lllllllc..........................rr..rrrcchh..........
-#=GC SS                                             ((.(((((((((((......)))))))))))))(((((((((.(((.............<(((.<>.)))>...............))))))))))))...........((((...<(((..........<.(((((((.....)))))...))....>.........)))>.))))
-//
-```
+> Hiraizumi, M., Perry, N.T., Durrant, M.G. et al. Structural mechanism of bridge RNA-guided recombination. Nature 630, 994–1002 (2024). https://doi.org/10.1038/s41586-024-07570-2
 
 
 # Webtool
 
-[Published app](bridge.hsulab.arcinstitute.org)
+[Published app](https://bridge.hsulab.arcinstitute.org/)
 
 ### Run locally
 
 ```bash
 streamlit run app.py --server.address=0.0.0.0
 ```
+
+# CLI
+
+See [BridgeRNADesigner](https://github.com/hsulab-arc/BridgeRNADesigner)
