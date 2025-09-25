@@ -17,9 +17,9 @@ def get_image_as_base64(path):
 
 # Scaffold name mapping
 scaffold_name_mapping = {
-    'IS621': 'IS621_bRNA',
-    'IS622 (WT)': 'IS622_bRNA_WT',
-    'IS622 (enhanced)': 'IS622_bRNA_enhanced'
+    'IS621': 'IS621',
+    'ISCro4 (WT)': 'ISCro4_WT',
+    'ISCro4 (enhanced)': 'ISCro4_enhanced'
 }
 
 # App init
@@ -50,7 +50,7 @@ a {
 }
 </style>
 """
-st.markdown(custom_css, unsafe_allow_html=True)
+st.html(custom_css)
 
 # Main
 ## Title
@@ -85,11 +85,11 @@ if 'calc_button' not in st.session_state:
 st.markdown('#### Input')
 col1, col2, col3, col4, col5 = st.columns([0.2, 0.01, 0.2, 0.01, 0.2])
 with col1:
-    target = st.text_input('Target sequence (14 bp)', value='ATCGGGCCTACGCA')
+    target = st.text_input('Target sequence (14 bp)', value='ATCAGGCCTACGTC')
 with col3:
     donor = st.text_input('Donor sequence (14 bp)', value='ACAGTATCTTGTAT')    
 with col5:
-    bridge_rna_scaffold = st.selectbox('Bridge RNA scaffold', ['IS621', 'IS622 (WT)', 'IS622 (enhanced)'])
+    bridge_rna_scaffold = st.selectbox('Bridge RNA scaffold', ['ISCro4 (enhanced)', 'ISCro4 (WT)', 'IS621'])
 
 # create dataframe for display
 st.markdown('#### Sequence Components')
@@ -146,7 +146,7 @@ if target != '' and donor != '':
                     # fasta generation
                     st.markdown('##### FASTA')
                     fasta = st.session_state['brna'].format_fasta()
-                    st.markdown(f"```\n{fasta}\n```")
+                    st.code(fasta)
                     ## download link
                     col1, col2 = st.columns([0.3, 0.7])
                     with col1:
@@ -179,12 +179,11 @@ if target != '' and donor != '':
 
 st.divider()
 
-# TODO: Update Science reference
 st.markdown("""
 ### References
 Perry, N.T., Bartie, L.J., Katrekar, D. et al.
 Megabase-scale human genome rearrangement with programmable bridge recombinases.
-Science (in press, 2025).
+Science (2025). https://doi.org/10.1126/science.adz0276
             
 Durrant, M.G., Perry, N.T., Pai, J.J. et al.
 Bridge RNAs direct programmable recombination of target and donor DNA. 
