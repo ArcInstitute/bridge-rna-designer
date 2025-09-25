@@ -7,12 +7,20 @@ import pandas as pd
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 from bridgernadesigner.run import design_bridge_rna
+import warnings
 
 # Functions
 def get_image_as_base64(path):
     with open(path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     return "data:image/png;base64," + encoded_string
+
+# Scaffold name mapping
+scaffold_name_mapping = {
+    'IS621': 'IS621',
+    'ISCro4 (WT)': 'ISCro4_WT',
+    'ISCro4 (enhanced)': 'ISCro4_enhanced'
+}
 
 # App init
 st.set_page_config(
@@ -59,10 +67,9 @@ st.markdown(
     </div>
     <div>
         <p>
-           Given 14 bp target and donor sequences, 
-           this tool will return a candidate 177 nt bridge RNA
-           that should work with the wild-type bridge recombinase
-           (IS621).
+           Given 14 bp target and donor sequences and a bridge RNA scaffold, 
+           this tool will return the sequence of candidate bridge RNAs
+           that should work with the respective bridge recombinase.
         </p>
     </div>
     """, unsafe_allow_html=True
@@ -75,25 +82,29 @@ if 'calc_button' not in st.session_state:
     st.session_state.calc_button = False
 
 # Input
-col1, col2, col3 = st.columns([0.29, 0.01, 0.70])
+st.markdown('#### Input')
+col1, col2, col3, col4, col5 = st.columns([0.2, 0.01, 0.2, 0.01, 0.2])
 with col1:
-    st.markdown('#### Input')
-    target = st.text_input('Target sequence (14 bp)', value='ATCGGGCCTACGCA')
-    donor = st.text_input('Donor sequence (14 bp)', value='ACAGTATCTTGTAT')    
+    target = st.text_input('Target sequence (14 bp)', value='ATCAGGCCTACGTC')
 with col3:
-    # create dataframe for display
-    st.markdown('#### Sequence Components')
-    df = pd.DataFrame(
-        {
-            'Left (7 bp)': [target[0:7], donor[0:7]],
-            'Core (2 bp)': [target[7:9], donor[7:9]],
-            'Right (5 bp)': [target[9:], donor[9:]]
-        },
-        index=['Target', 'Donor']
-    )
-    st.table(df)
-    with stylable_container('btn-calc', css_styles='button { margin-left: 45px; width: 55%; }'):
-        st.session_state['calc_button'] = st.button('Design Bridge RNA')
+    donor = st.text_input('Donor sequence (14 bp)', value='ACAGTATCTTGTAT')    
+with col5:
+    bridge_rna_scaffold = st.selectbox('Bridge RNA scaffold', ['ISCro4 (enhanced)', 'ISCro4 (WT)', 'IS621'])
+
+# create dataframe for display
+st.markdown('#### Sequence Components')
+df = pd.DataFrame(
+    {
+        'Left (7 bp)': [target[0:7], donor[0:7]],
+        'Core (2 bp)': [target[7:9], donor[7:9]],
+        'Right (5 bp)': [target[9:], donor[9:]]
+    },
+    index=['Target', 'Donor']
+)
+st.table(df)
+
+with stylable_container('btn-calc', css_styles='button { margin-left: 5px; width: 45%; }'):
+    st.session_state['calc_button'] = st.button('Design Bridge RNA')
     
 def create_stockholm_table():
     DF = pd.DataFrame({
@@ -120,19 +131,38 @@ if target != '' and donor != '':
             # Calculate bridge RNA
             st.markdown('#### Bridge RNA')
             try:
-                st.session_state['brna'] = design_bridge_rna(target, donor)
+                with warnings.catch_warnings(record=True) as w:
+                    warnings.simplefilter('always')
+                    st.session_state['brna'] = design_bridge_rna(target, donor, scaffold_name_mapping[bridge_rna_scaffold])
             except Exception as e:
                 st.error(f'Error: {e}')
                 st.session_state['brna'] = None
             # Display output
             if st.session_state['brna'] is not None:
-                tab1, tab2 = st.tabs(['stockholm', 'fasta (with annealing oligos)'])
+                for warning in w:
+                    st.warning(f'Warning: {warning.message}')
+                tab1, tab2 = st.tabs(['fasta', 'stockholm'])
                 with tab1:
+                    # fasta generation
+                    st.markdown('##### FASTA')
+                    fasta = st.session_state['brna'].format_fasta()
+                    st.code(fasta)
+                    ## download link
+                    col1, col2 = st.columns([0.3, 0.7])
+                    with col1:
+                        # download
+                        st.download_button(
+                            label='Download fasta',
+                            data=fasta,
+                            file_name='bridge-rna.fasta',
+                            mime='text/plain',
+                        )
+                with tab2:
                     # stockholm tab
                     st.markdown('##### STOCKHOLM')
                     stockholm = st.session_state['brna'].format_stockholm()
                     st.markdown(f'```\n{stockholm}\n```')
-                    col1,col2,col3 = st.columns([0.3, 0.6, 0.1])
+                    col1, col2, col3 = st.columns([0.3, 0.6, 0.1])
                     ## download link
                     with col1:
                         with stylable_container('dtl-stockholm', css_styles='button { height: 48px; width: 100%; }'):
@@ -145,48 +175,15 @@ if target != '' and donor != '':
                     with col2:
                         with st.expander('Stockholm format key'):
                             st.write(create_stockholm_table())
-                with tab2:
-                    # fasta tab
-                    st.markdown('##### FASTA')
-                    # annealing oligos
-                    include_an_oligos = st.checkbox('Include annealing oligos?', value=False)
-                    if include_an_oligos:
-                        col1a,col2a = st.columns([0.5, 0.5])
-                        with col1a:
-                            lh_overhang = st.text_input(
-                                '5\' overhang for annealing oligos.', 
-                                value='TAGC'
-                            )
-                        with col2a:
-                            rh_overhang = st.text_input(
-                                '3\' overhang for annealing oligos', 
-                                value='GGCC'
-                            )
-                    else:
-                        lh_overhang = None
-                        rh_overhang = None
-                    # fasta generation
-                    fasta = st.session_state['brna'].format_fasta(
-                        include_annealing_oligos=include_an_oligos,
-                        lh_overhang=lh_overhang,
-                        rh_overhang=rh_overhang
-                    )
-                    st.markdown(f"```\n{fasta}\n```")
-                    ## download link
-                    col1,col2 = st.columns([0.3, 0.7])
-                    with col1:
-                        # download
-                        st.download_button(
-                            label='Download fasta',
-                            data=fasta,
-                            file_name='bridge-rna.fasta',
-                            mime='text/plain',
-                        )
                         
 
 st.divider()
+
 st.markdown("""
 ### References
+Perry, N.T., Bartie, L.J., Katrekar, D. et al.
+Megabase-scale human genome rearrangement with programmable bridge recombinases.
+Science (2025). https://doi.org/10.1126/science.adz0276
             
 Durrant, M.G., Perry, N.T., Pai, J.J. et al.
 Bridge RNAs direct programmable recombination of target and donor DNA. 
@@ -199,6 +196,10 @@ Nature 630, 994–1002 (2024). https://doi.org/10.1038/s41586-024-07570-2
 st.markdown("""
 ### Code
             
-View the code and obtain the CLI tool from [GitHub](https://github.com/hsulab-arc/BridgeRNADesigner)
+You can view the code and obtain the CLI tool from [GitHub](https://github.com/hsulab-arc/BridgeRNADesigner).
 """)
 
+st.markdown("""
+### Contact
+This tool was developed by Nicholas Youngblut, Matthew G. Durrant, Nicholas T. Perry, and Gwanggyu Sun. For any questions or feedback, please contact [Gwanggyu Sun](mailto:gwanggyu.sun@arcinstitute.org).
+""")
