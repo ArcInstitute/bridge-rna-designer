@@ -50,7 +50,7 @@ a {
 }
 </style>
 """
-st.html(custom_css)
+st.markdown(custom_css, unsafe_allow_html=True)
 
 # Main
 ## Title
